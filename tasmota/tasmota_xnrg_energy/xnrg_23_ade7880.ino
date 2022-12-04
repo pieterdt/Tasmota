@@ -33,7 +33,7 @@
 #define XI2C_65                 65           // See I2CDEVICES.md
 
 #define ADE7880_ADDR            0x38
-
+#define ADE7880_3P3W            0x90          // Three wire Three phase
 /*********************************************************************************************/
 
 #define ADE7880_MORE_REGS                    // Add Neutral Current information
@@ -188,7 +188,7 @@ enum Ade7880PowerQualityRegisters {
   ADE7880_PHSIGN,                  // 0xE617  R    16  16       U   N/A         Power sign register. See Table 46.
   ADE7880_CONFIG,                  // 0xE618  R/W  16  16       U   0x0002      ADE7880 configuration register. See Table 47.
   ADE7880_MMODE = 0xE700,          // 0xE700  R/W  8   8        U   0x1C        Measurement mode register. See Table 48.
-  ADE7880_ACCMODE,                 // 0xE701  R/W  8   8        U   0x80        Accumulation mode register. See Table 49.
+  ADE7880_ACCMODE = 0xE701,        // 0xE701  R/W  8   8        U   0x80        Accumulation mode register. See Table 49.
   ADE7880_LCYCMODE,                // 0xE702  R/W  8   8        U   0x78        Line accumulation mode behavior. See Table 51.
   ADE7880_PEAKCYC,                 // 0xE703  R/W  8   8        U   0x00        Peak detection half line cycles.
   ADE7880_SAGCYC,                  // 0xE704  R/W  8   8        U   0x00        SAG detection half line cycles.
@@ -371,6 +371,10 @@ bool Ade7880Init(void) {
 #ifdef ADE7880_PROFILING
   uint32_t start = millis();
 #endif  // ADE7880_PROFILING
+
+#ifdef ADE7880_3P3W
+  Ade7880WriteVerify(ADE7880_ACCMODE, 0x90);
+#endif
 
   uint32_t status1 = Ade7880ReadVerify(ADE7880_STATUS1);                   // 0xE503 - 0x01A08000
   if (bitRead(status1, 15)) {                                              // RSTDONE
